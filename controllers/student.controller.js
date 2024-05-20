@@ -1,12 +1,13 @@
 const jwt = require("jsonwebtoken");
-const {students} = require("../database")
-const SECRET = "jg45y398%(44*++8ybg";
+const studentModel = require("../models/student.model");
+const secret = process.env.SECRET;
 
 // @request GET
 // @authentication notrequired
 // @api /api/students
 // @desc get all the students
 const getStudents = (req, res) => {
+
   res.status(200).json(students);
 };
 
@@ -27,18 +28,17 @@ const getStudent = (req, res) => {
 // @authentication required
 // @api /api/students
 // @desc request to add new student
-const postStudent = (req, res) => {
-  jwt.verify(req.token, SECRET, (err, data) => {
-    if (err) {
-      res.status(401).send("Unauthorized user");
-    }
+const postStudent = async (req, res) => {
+  // jwt.verify(req.token, secret, (err, data) => {
+  //   if (err) {
+  //     res.status(401).send("Unauthorized user");
+  //   }
 
-    const { id, name, age } = req.body;
-    const student = { id, name, age };
+    const student = await studentModel.create(req.body);
 
-    students.push(student);
+    
     res.status(201).json(student);
-  });
+  // });
 };
 
 // @request PATCH
@@ -46,7 +46,7 @@ const postStudent = (req, res) => {
 // @api /api/students/:id
 // @desc patch request to update existing student
 const patchStudent = (req, res) => {
-  jwt.verify(req.token, SECRET, (err, data) => {
+  jwt.verify(req.token, secret, (err, data) => {
     if (err) {
       res.status(401).send("Unauthorized user");
     }
@@ -73,7 +73,7 @@ const patchStudent = (req, res) => {
 // @api /api/students/:id
 // @desc put request to rewrite existing student
 const putStudent = (req, res) => {
-  jwt.verify(req.token, SECRET, (err, data) => {
+  jwt.verify(req.token, secret, (err, data) => {
     if (err) {
       res.status(401).send("Unauthorized user");
     }
@@ -95,7 +95,7 @@ const putStudent = (req, res) => {
 // @api /api/students/:id
 // @desc put request to rewrite existing student
 const deleteStudent = (req, res) => {
-  jwt.verify(req.token, SECRET, (err, data) => {
+  jwt.verify(req.token, secret, (err, data) => {
     if (err) {
       res.status(401).send("Unauthorized user");
       // return;

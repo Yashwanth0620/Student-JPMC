@@ -1,31 +1,31 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
-const { validateToken } = require("./middleware/validateToken");
-const {
-  getStudents,
-  deleteStudent,
-  getStudent,
-  postStudent,
-  patchStudent,
-  putStudent,
-} = require("./controllers/studentController");
-const { loginUser } = require("./controllers/userController");
-const app = express();
-const PORT = 3000;
+const mongoose = require("mongoose");
+require("dotenv").config();
 
+const errorHandler = require("./middleware/errorHandling");
+const studentRoutes = require("./routes/student.route");
+const userRoutes = require("./routes/user.route");
+
+mongoose
+.connect("mongodb://localhost:27017/student-management", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log("Connected to DataBase successfully..."));
+
+const app = express();
+const port = process.env.PORT;
+
+app.use(errorHandler);
 app.use(express.json());
 
-// routes for user
-app.post("/login", loginUser);
+// connecting api endpoint to user routes
+app.use("/api/user", userRoutes);
 
-// routes for student functionality
-app.get("/api/students", getStudents);
-app.get("/api/students/:id", getStudent);
-app.post("/api/students", validateToken, postStudent);
-app.put("/api/students/:id", validateToken, putStudent);
-app.patch("/api/students/:id", validateToken, patchStudent);
-app.delete("/api/students/:id", validateToken, deleteStudent);
+// connecting api endpoint to student routes
+app.use("/api/students", studentRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Listening to port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Listening to port ${port}`);
 });
